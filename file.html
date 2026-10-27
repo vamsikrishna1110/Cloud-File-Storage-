@@ -1,0 +1,475 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CloudBox - Cloud File Storage</title>
+
+<style>
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: Arial, sans-serif;
+    background: #f4f7fc;
+    color: #202b3c;
+}
+
+.container {
+    display: flex;
+    min-height: 100vh;
+}
+
+/* Sidebar */
+.sidebar {
+    width: 230px;
+    background: #172554;
+    color: white;
+    padding: 25px 18px;
+    flex-shrink: 0;
+}
+
+.logo {
+    font-size: 27px;
+    color: #60a5fa;
+    margin-bottom: 35px;
+}
+
+.sidebar a {
+    display: block;
+    padding: 13px;
+    color: #dbeafe;
+    text-decoration: none;
+    border-radius: 7px;
+    margin-bottom: 8px;
+}
+
+.sidebar a:hover,
+.sidebar a.active {
+    background: #304477;
+}
+
+.storage-box {
+    margin-top: 45px;
+    background: #243663;
+    padding: 16px;
+    border-radius: 10px;
+}
+
+.storage-box p {
+    font-size: 13px;
+    margin-bottom: 12px;
+}
+
+.progress {
+    height: 8px;
+    background: #475985;
+    border-radius: 10px;
+    overflow: hidden;
+    margin-bottom: 10px;
+}
+
+.progress-fill {
+    width: 65%;
+    height: 100%;
+    background: #60a5fa;
+}
+
+/* Main area */
+.main {
+    flex: 1;
+    min-width: 0;
+}
+
+.topbar {
+    background: white;
+    padding: 22px 30px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 15px;
+    border-bottom: 1px solid #e2e8f0;
+}
+
+.topbar h2 {
+    font-size: 23px;
+}
+
+.profile {
+    background: #dbeafe;
+    color: #1d4ed8;
+    padding: 10px 14px;
+    border-radius: 25px;
+    font-size: 13px;
+}
+
+.content {
+    padding: 30px;
+}
+
+.welcome {
+    margin-bottom: 25px;
+}
+
+.welcome h1 {
+    font-size: 28px;
+    margin-bottom: 8px;
+}
+
+.welcome p {
+    color: #64748b;
+}
+
+/* Search */
+.search-bar {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 25px;
+}
+
+.search-bar input {
+    flex: 1;
+    min-width: 0;
+    padding: 13px;
+    border: 1px solid #dbe2ed;
+    border-radius: 8px;
+    font-size: 14px;
+}
+
+/* Upload section */
+.upload-area {
+    background: white;
+    border: 2px dashed #93b4f8;
+    border-radius: 12px;
+    padding: 35px 15px;
+    text-align: center;
+    margin-bottom: 30px;
+}
+
+.upload-icon {
+    font-size: 42px;
+    margin-bottom: 12px;
+}
+
+.upload-area h3 {
+    margin-bottom: 10px;
+}
+
+.upload-area p {
+    color: #64748b;
+    font-size: 14px;
+    margin-bottom: 18px;
+}
+
+.upload-btn {
+    display: inline-block;
+    background: #2563eb;
+    color: white;
+    padding: 12px 20px;
+    border-radius: 7px;
+    cursor: pointer;
+    border: none;
+    font-size: 14px;
+}
+
+.upload-btn:hover {
+    background: #1d4ed8;
+}
+
+#fileInput {
+    display: none;
+}
+
+/* Categories */
+.section-title {
+    font-size: 21px;
+    margin-bottom: 18px;
+}
+
+.categories {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 16px;
+    margin-bottom: 32px;
+}
+
+.category-card {
+    background: white;
+    padding: 20px;
+    border: 1px solid #e6ebf3;
+    border-radius: 10px;
+}
+
+.category-icon {
+    font-size: 30px;
+    margin-bottom: 12px;
+}
+
+.category-card h3 {
+    font-size: 16px;
+    margin-bottom: 8px;
+}
+
+.category-card p {
+    font-size: 13px;
+    color: #64748b;
+}
+
+/* Files table */
+.files-panel {
+    background: white;
+    border: 1px solid #e6ebf3;
+    border-radius: 10px;
+    overflow: hidden;
+}
+
+.files-heading {
+    padding: 20px;
+    font-size: 20px;
+}
+
+.table-wrap {
+    overflow-x: auto;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    min-width: 580px;
+}
+
+th, td {
+    text-align: left;
+    padding: 16px 20px;
+    border-top: 1px solid #edf1f7;
+    font-size: 14px;
+}
+
+th {
+    background: #f8fafc;
+    color: #64748b;
+}
+
+.file-name {
+    font-weight: bold;
+}
+
+.file-type {
+    color: #64748b;
+    font-size: 12px;
+    margin-top: 5px;
+}
+
+.status {
+    color: #15803d;
+    background: #dcfce7;
+    padding: 6px 9px;
+    border-radius: 15px;
+    font-size: 12px;
+}
+
+footer {
+    padding: 25px;
+    text-align: center;
+    color: #64748b;
+    font-size: 13px;
+}
+
+/* Responsive */
+@media (max-width: 950px) {
+    .categories {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+@media (max-width: 650px) {
+    .container {
+        flex-direction: column;
+    }
+
+    .sidebar {
+        width: 100%;
+    }
+
+    .topbar {
+        padding: 20px;
+    }
+
+    .content {
+        padding: 18px;
+    }
+
+    .categories {
+        grid-template-columns: 1fr;
+    }
+
+    .welcome h1 {
+        font-size: 24px;
+    }
+}
+</style>
+</head>
+
+<body>
+
+<div class="container">
+
+    <!-- Sidebar -->
+    <aside class="sidebar">
+        <h2 class="logo">☁ CloudBox</h2>
+
+        <a href="#dashboard" class="active">🏠 Dashboard</a>
+        <a href="#myfiles">📁 My Files</a>
+        <a href="#documents">📄 Documents</a>
+        <a href="#images">🖼 Photos</a>
+        <a href="#videos">🎬 Videos</a>
+        <a href="#shared">🔗 Shared Files</a>
+        <a href="#trash">🗑 Trash</a>
+
+        <div class="storage-box">
+            <p>Storage Used</p>
+            <h3>6.5 GB / 10 GB</h3>
+            <br>
+            <div class="progress">
+                <div class="progress-fill"></div>
+            </div>
+            <p>65% of your storage is used.</p>
+        </div>
+    </aside>
+
+    <!-- Main content -->
+    <main class="main" id="dashboard">
+
+        <header class="topbar">
+            <h2>My Cloud Drive</h2>
+            <div class="profile">👤 My Account</div>
+        </header>
+
+        <div class="content">
+
+            <section class="welcome">
+                <h1>Welcome to CloudBox!</h1>
+                <p>Store, organize and access your files in one place.</p>
+            </section>
+
+            <!-- Search -->
+            <div class="search-bar">
+                <input type="search" placeholder="Search your files...">
+            </div>
+
+            <!-- Upload -->
+            <section class="upload-area">
+                <div class="upload-icon">☁️</div>
+                <h3>Upload your files</h3>
+                <p>Select files from your computer to get started.</p>
+
+                <label for="fileInput" class="upload-btn">
+                    Choose Files
+                </label>
+                <input type="file" id="fileInput" multiple>
+            </section>
+
+            <!-- Categories -->
+            <h2 class="section-title">My Categories</h2>
+
+            <section class="categories">
+                <div class="category-card" id="documents">
+                    <div class="category-icon">📄</div>
+                    <h3>Documents</h3>
+                    <p>24 files · 1.2 GB</p>
+                </div>
+
+                <div class="category-card" id="images">
+                    <div class="category-icon">🖼️</div>
+                    <h3>Photos</h3>
+                    <p>156 files · 2.8 GB</p>
+                </div>
+
+                <div class="category-card" id="videos">
+                    <div class="category-icon">🎬</div>
+                    <h3>Videos</h3>
+                    <p>18 files · 2.1 GB</p>
+                </div>
+
+                <div class="category-card" id="shared">
+                    <div class="category-icon">🔗</div>
+                    <h3>Shared Files</h3>
+                    <p>12 files · 400 MB</p>
+                </div>
+            </section>
+
+            <!-- File list -->
+            <section class="files-panel" id="myfiles">
+                <h2 class="files-heading">Recent Files</h2>
+
+                <div class="table-wrap">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>File Name</th>
+                                <th>Size</th>
+                                <th>Date Modified</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+
+                        <tbody>
+                            <tr>
+                                <td>
+                                    <div class="file-name">📄 Project Report.pdf</div>
+                                    <div class="file-type">PDF Document</div>
+                                </td>
+                                <td>2.4 MB</td>
+                                <td>27 Oct 2026</td>
+                                <td><span class="status">Stored</span></td>
+                            </tr>
+
+                            <tr>
+                                <td>
+                                    <div class="file-name">🖼️ Vacation Photo.jpg</div>
+                                    <div class="file-type">Image</div>
+                                </td>
+                                <td>4.8 MB</td>
+                                <td>26 Oct 2026</td>
+                                <td><span class="status">Stored</span></td>
+                            </tr>
+
+                            <tr>
+                                <td>
+                                    <div class="file-name">📄 Assignment.docx</div>
+                                    <div class="file-type">Word Document</div>
+                                </td>
+                                <td>1.1 MB</td>
+                                <td>25 Oct 2026</td>
+                                <td><span class="status">Stored</span></td>
+                            </tr>
+
+                            <tr>
+                                <td>
+                                    <div class="file-name">🎬 Presentation.mp4</div>
+                                    <div class="file-type">Video</div>
+                                </td>
+                                <td>180 MB</td>
+                                <td>24 Oct 2026</td>
+                                <td><span class="status">Stored</span></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+
+        </div>
+
+        <footer id="trash">
+            © 2026 CloudBox | Cloud File Storage Project
+        </footer>
+
+    </main>
+</div>
+
+</body>
+</html>
